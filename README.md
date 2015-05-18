@@ -1,5 +1,5 @@
-# yii2-history
-Yii2-History is a behavior and a set of widgets to track all modifications performed on a model
+# Yii2-audittrail
+Yii2-audittrail is a behavior and a set of widgets to track all modifications performed on a model
 
 
 ## Installation
