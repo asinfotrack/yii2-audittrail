@@ -120,7 +120,8 @@ class AuditTrail extends \yii\grid\GridView
 		
 		//data provider configuration
 		$searchModel = new AuditTrailEntrySearch();
-		$this->dataProvider = $searchModel->search($this->searchParams === null ? Yii::$app->request->getQueryParams() : $this->searchParams);
+		$searchParams = $this->searchParams === null ? Yii::$app->request->getQueryParams() : $this->searchParams;
+		$this->dataProvider = $searchModel->search($searchParams, $this->model);
 		
 		//prepare columns of grid view
 		$this->columns = $this->createColumnConfig();

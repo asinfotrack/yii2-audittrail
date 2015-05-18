@@ -1,6 +1,7 @@
 <?php
 namespace asinfotrack\yii2\audittrail\models;
 
+use yii\data\ActiveDataProvider;
 use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
 
 class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTrailEntry
@@ -25,19 +26,29 @@ class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTra
 		return Model::scenarios();
 	}
 	
-	public function search($params)
+	/**
+	 * Creates the dataprovider for searching audit trails
+	 * @param mixed $params the params as used by yii's search methods
+	 * @param \yii\db\ActiveRecord $subject the model to get the audit trail entries for
+	 * @return \asinfotrack\yii2\audittrail\models\ActiveDataProvider
+	 */
+	public function search($params, $subject=null)
 	{
 		/* @var $query \asinfotrack\yii2\audittrail\models\AuditTrailEntryQuery */
 		
+		//prepare data provider
 		$query = AuditTrailEntry::find();
+		if ($subject !== null) $query->subject($subject);
 		$dataProvider = new ActiveDataProvider([
 			'query'=>$query,
 		]);
 
+		//if no query data, return it
 		if (!($this->load($params) && $this->validate())) {
 			return $dataProvider;
 		}
 		
+		//apply filtering
 		$query->andFilterWhere([
 			'id'=>$this->id,
 			'happened_at'=>$this->happened_at,
