@@ -8,13 +8,13 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```bash
-$ composer require asinfotrack/yii2-history
+$ composer require asinfotrack/yii2-audittrail
 ```
 
 or add
 
 ```
-"asinfotrack/yii2-history": "dev-master"
+"asinfotrack/yii2-audittrail": "dev-master"
 ```
 
 to the `require` section of your `composer.json` file.
