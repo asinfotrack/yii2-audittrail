@@ -71,14 +71,12 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 	'changeTypeCallback'=>function ($type, $model) {
 		return Html::tag('span', strtoupper($type), ['class'=>'label label-info']);
 	},
-	'attributeRenderCallbacks'=>[
+	'attributeOutput'=>[
 		'desktop_id'=>function ($value) {
 			$model = Desktop::findOne($value);
 			return sprintf('%s %s', $model->manufacturer, $model->device_name);
 		},
-		'last_checked'=>function ($value) {
-			return Yii::$app->formatter->asDatetime($value);
-		},
+		'last_checked'=>'datetime',
 	],
 	'dataTableOptions'=>['class'=>'table table-condensed table-bordered'],
 ]) ?>
