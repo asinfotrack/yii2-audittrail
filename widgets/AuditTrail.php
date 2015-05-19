@@ -191,9 +191,9 @@ class AuditTrail extends \yii\grid\GridView
 					//table head
 					$ret .= Html::beginTag('thead');
 					$ret .= Html::beginTag('tr');
-					$ret .= Html::tag('th', Yii::t('yii', 'Attribute'));
-					$ret .= Html::tag('th', Yii::t('yii', 'From'));
-					$ret .= Html::tag('th', Yii::t('yii', 'To'));
+					$ret .= Html::tag('th', Yii::t('app', 'Attribute'));
+					$ret .= Html::tag('th', Yii::t('app', 'From'));
+					$ret .= Html::tag('th', Yii::t('app', 'To'));
 					$ret .= Html::endTag('tr');
 					$ret .= Html::endTag('thead');
 					
