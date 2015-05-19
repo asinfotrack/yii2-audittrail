@@ -1,6 +1,7 @@
 <?php
-namespace \asinfotrack\yii2\audittrail\widgets;
+namespace asinfotrack\yii2\audittrail\widgets;
 
+use Yii;
 use yii\grid\DataColumn;
 use yii\helpers\Html;
 use yii\helpers\Json;
@@ -74,13 +75,14 @@ class AuditTrail extends \yii\grid\GridView
 	public $changeTypeCallback = null;
 	
 	/**
-	 * @var \Closure[] contains an array with a model attribute as key and a closure as its
-	 * value. Example:
+	 * @var \Closure[] contains an array with a model attribute as key and a either a string with 
+	 * a default yii-format or a closure as its value. Example:
 	 * <code>
 	 * 		[
-	 * 			'email'=>function($value) {
-	 * 				return Html::mailto($value);
+	 * 			'title'=>function($value) {
+	 * 				return Html::tag('strong', $value);
 	 *			},
+	 *			'email'=>'email',
 	 * 		]
 	 * </code>	 * 
 	 * This provides you the ability to render related objects or complex value instead of
@@ -88,7 +90,7 @@ class AuditTrail extends \yii\grid\GridView
 	 * 
 	 * Make sure each closure is in the format 'function ($value)'.
 	 */
-	public $attributeRenderCallbacks = [];
+	public $attributeOutput = [];
 	
 	/**
 	 * @var mixed the options for the inner table displaying the actual changes
@@ -140,7 +142,7 @@ class AuditTrail extends \yii\grid\GridView
 		//get local references
 		$userIdCallback = $this->userIdCallback;
 		$changeTypeCallback = $this->changeTypeCallback;
-		$attributeRenderCallbacks = $this->attributeRenderCallbacks;
+		$attributeOutput = $this->attributeOutput;
 		$dataTableOptions = $this->dataTableOptions;
 		
 		//prepare column config
@@ -148,6 +150,7 @@ class AuditTrail extends \yii\grid\GridView
 			'happened_at:datetime',
 			[
 				'attribute'=>'type',
+				'format'=>$changeTypeCallback === null ? 'text' : 'raw',
 				'value'=>function ($model, $key, $index, $column) use ($changeTypeCallback) {
 					if ($changeTypeCallback === null) {
 						return $model->type;
@@ -158,6 +161,7 @@ class AuditTrail extends \yii\grid\GridView
 			],
 			[
 				'attribute'=>'user_id',
+				'format'=>$userIdCallback === null ? 'text' : 'raw',
 				'value'=>function ($model, $key, $index, $column) use ($userIdCallback) {
 					if ($userIdCallback === null) {
 						return $model->user_id;
@@ -168,42 +172,75 @@ class AuditTrail extends \yii\grid\GridView
 			],
 			[
 				'attribute'=>'data',
-				'value'=>function ($model, $key, $index, $column) use ($attributeRenderCallbacks, $dataTableOptions) {
+				'format'=>'raw',
+				'value'=>function ($model, $key, $index, $column) use ($attributeOutput, $dataTableOptions) {
 					/* @var $model \yii\db\ActiveRecord */
 					
 					//catch empty data
-					if ($model->data === null) return null;
-					$data = Json::decode($model->data);
-					if (count($data) == null) return null;
+					$changes = $model->changes;
+					if ($changes === null || count($changes) == 0) {
+						return null;
+					}
 					
 					$ret = Html::beginTag('table', $dataTableOptions);
 					
 					//table head
 					$ret .= Html::beginTag('thead');
 					$ret .= Html::beginTag('tr');
-					$ret .= Html::tag('th', Yii::t('app', 'Attribute'));
-					$ret .= Html::tag('th', Yii::t('app', 'From'));
-					$ret .= Html::tag('th', Yii::t('app', 'To'));
+					$ret .= Html::tag('th', Yii::t('yii', 'Attribute'));
+					$ret .= Html::tag('th', Yii::t('yii', 'From'));
+					$ret .= Html::tag('th', Yii::t('yii', 'To'));
 					$ret .= Html::endTag('tr');
 					$ret .= Html::endTag('thead');
 					
 					//table body
 					$ret .= Html::beginTag('tbody');
-					foreach ($data as $change) {
-						$callback = isset($attributeRenderCallbacks[$change->attr]) ? $attributeRenderCallbacks[$change->attr] : null;
-						
+					foreach ($changes as $change) {					
 						$ret .= Html::beginTag('tr');
-						$ret .= Html::tag('td', $model->getAttributeLabel($change->attr));
-						$ret .= Html::tag('td', $callback !== null ? call_user_func($callback, $change->from) : $change->from);
-						$ret .= Html::tag('td', $callback !== null ? call_user_func($callback, $change->to) : $change->to);
+						$ret .= Html::tag('td', $model->getAttributeLabel($change['attr']));
+						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['from']));
+						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['to']));
 						$ret .= Html::endTag('tr');
 					}
 					$ret .= Html::endTag('tbody');
 					
 					$ret .= Html::endTag('table');
+					
+					return $ret;
 				},
 			],
 		];
+	}
+	
+	/**
+	 * Formats a value into its final outoput. If the value is null, the formatters null-display is used.
+	 * If there is a value and nothing is declared in attributeOutput, the raw value is returned. If an
+	 * output is defined (either a format-string or a closure, it is used for formatting.
+	 * 
+	 * @param string $attrName name of the attribute
+	 * @param mixed $value the value
+	 * @throws InvalidConfigException if the attributeOutput for this attribute is not a string or closure
+	 * @return mixed the formatted output value
+	 */
+	protected function formatValue($attrName, $value)
+	{
+		//check if there is a formatter defined
+		if (isset($this->attributeOutput[$attrName])) {
+			//assert attr output format is either a string or a closure
+			if (!is_string($this->attributeOutput[$attrName]) && !($this->attributeOutput[$attrName] instanceof \Closure)) {
+				$msg = sprintf('The attribute out put for the attribute %s is invalid. It needs to be a string or a closure!', $attrName);
+				throw new InvalidConfigException($msg);
+			}
+
+			//perform formatting
+			if ($this->attributeOutput[$attrName] instanceof \Closure) {
+				return call_user_func($this->attributeOutput[$attrName], $value);
+			} else {
+				return Yii::$app->formatter->format($value, $this->attributeOutput[$attrName]);
+			}			
+		} else {
+			return Yii::$app->formatter->asText($value);
+		}
 	}
 	
 }

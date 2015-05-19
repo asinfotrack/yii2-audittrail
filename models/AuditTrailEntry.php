@@ -1,10 +1,10 @@
 <?php
 namespace asinfotrack\yii2\audittrail\models;
 
+use Yii;
 use yii\helpers\Json;
 use yii\base\InvalidCallException;
 use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
-
 
 /**
  * This is the model class for audit trail entries and the table "audit_trail_entry".
@@ -20,9 +20,16 @@ use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
  * @property integer $user_id
  * @property string $type
  * @property string $data
+ * 
+ * @property \stdClass[] $changes
  */
 class AuditTrailEntry extends \yii\db\ActiveRecord
 {
+	
+	/**
+	 * @var \stdClass[] holds the changes
+	 */
+	private $_changes = null;
 	
 	/**
 	 * @inheritdoc
@@ -80,17 +87,55 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 		//prevent updating of audit trail entries
 		if (!$insert) throw new InvalidCallException('Updating audit trail entries is not allowed!');
 		
-		//prepare data attribute if necessary
-		if ($this->data !== null)
-		{
-			if (count($this->data) > 0) {
-				$this->data = Json::encode($this->data);	
-			} else {
-				$this->data = null;
-			}
+		//prepare data attribute
+		if (count($this->_changes) > 0) {
+			$this->data = Json::encode($this->_changes);
+		} else {
+			$this->data = null;
 		}
 		
 		return parent::beforeSave($insert);
+	}
+	
+	/**
+	 * Getter for the changes attribute
+	 * 
+	 * @return array array containing all changes (also as arrays)
+	 */
+	public function getChanges()
+	{
+		if ($this->_changes === null) {
+			$this->_changes = Json::decode($this->data);
+		}
+		return $this->_changes;
+	}
+	
+	/**
+	 * Setter for the changes. The changes need to be provided as instances of
+	 * sttdClass. Each object containing attr, from and to.
+	 * 
+	 * @param \stdClass[] $changes the changes
+	 */
+	public function setChanges($changes)
+	{
+		$this->_changes = $changes;
+		$this->data = Json::encode($this->_changes);
+	}
+	
+	/**
+	 * Adds a new change to this entry.
+	 * 
+	 * @param string $attr the name of the attribute
+	 * @param mixed $from the old value
+	 * @param mixed $to the new value
+	 */
+	public function addChange($attr, $from, $to)
+	{
+		$change = new \stdClass();
+		$change->attr = $attr;
+		$change->from = $from;
+		$change->to = $to;
+		$this->_changes[] = $change;
 	}
 	
 }

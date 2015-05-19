@@ -1,10 +1,13 @@
 <?php
 namespace asinfotrack\yii2\audittrail\behaviors;
 
+use Yii;
 use yii\db\ActiveRecord;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidValueException;
 use asinfotrack\yii2\audittrail\models\AuditTrailEntry;
+use yii\helpers\Json;
+use yii\validators\DefaultValueValidator;
 
 /**
  * Behavior which enables a model to be audited. Each modification (insert, update and delete)
@@ -75,7 +78,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	{
 		//assert owner extends class ActiveRecord
 		if (!($owner instanceof ActiveRecord)) {
-			throw new InvalidConfigException('The HistoryBehavior can only be applied to classes extending \yii\db\ActiveRecord');
+			throw new InvalidConfigException('The AuditTrailBehavior can only be applied to classes extending \yii\db\ActiveRecord');
 		}
 	
 		parent::attach($owner);
@@ -126,11 +129,15 @@ class AuditTrailBehavior extends \yii\base\Behavior
 		
 		//fetch dirty attributes and add changes
 		$relevantAttrs = $this->getRelevantDbAttributes();
+		$defValidator = new DefaultValueValidator();
 		foreach ($event->changedAttributes as $attrName=>$oldVal) {
 			//skip if ignored
 			if (!in_array($attrName, $relevantAttrs)) continue;
 			//add change
-			$entry->data[] = $this->createAttrChangeObj($attrName, $oldVal, $this->owner->{$attrName});
+			$newVal = $this->owner->{$attrName};
+			if ($newVal == '') $newVal = null;
+			if ($oldVal == $newVal) continue;
+			$entry->addChange($attrName, $oldVal, $newVal);
 		}
 		
 		static::saveEntry($entry);
@@ -148,42 +155,25 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * Creates and returns a preconfigured history-entry-model
+	 * Creates and returns a preconfigured audit trail model
 	 * 
-	 * @param string $changeKind the kind of history entry (use this classes statics)
-	 * @return \asinfotrack\yii2\history\models\HistoryEntry
+	 * @param string $changeKind the kind of audit trail entry (use this classes statics)
+	 * @return \asinfotrack\yii2\audittrail\models\AuditTrailEntry
 	 */
 	protected function createPreparedAuditTrailEntry($changeKind)
 	{
-		return new HistoryEntry([
+		$entry = new AuditTrailEntry([
 			'model_type'=>$this->owner->className(),
 			'foreign_pk'=>$this->createPrimaryKeyJson(),
 			'happened_at'=>$this->getHappenedAt(),
 			'user_id'=>$this->getUserId(),
 			'type'=>$changeKind,
-			'data'=>[],
 		]);
+		return $entry;
 	}
 	
 	/**
-	 * Creates an attribute change object which will later be persisted in json-format
-	 * 
-	 * @param string $attr name of the attribute
-	 * @param mixed $from old value
-	 * @param mixed $to new value
-	 * @return \stdClass the prepared attr change object
-	 */
-	protected function createAttrChangeObj($attr, $from, $to)
-	{
-		$obj = new \stdClass();
-		$obj->attr = $attr;
-		$obj->from = $from;
-		$obj->to = $to;
-		return $obj;
-	}
-	
-	/**
-	 * Returns the user id to use for a history-entry
+	 * Returns the user id to use for am audit trail entry
 	 * 
 	 * @return integer|null returns either a user id or null.
 	 */
@@ -203,7 +193,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * Returns the timestamp for the history-entry.
+	 * Returns the timestamp for the audit trail entry.
 	 * 
 	 * @return integer unix-timestamp
 	 */
@@ -225,14 +215,18 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	protected function createPrimaryKeyJson()
 	{
 		//fetch the objects pk	
-		$pk = $this->owner->primaryKey;
-		if ($pk === null) {
-			throw new InvalidConfigException('pk NULL received: please provide a pk-definition for table ' . $this->owner->tableName());
+		$pk = $this->owner->primaryKey();
+		
+		//assert that a valid pk was received
+		if ($pk === null || !is_array($pk) || count($pk) == 0) {
+			$msg = 'Invalid primary key definition: please provide a pk-definition for table ' . $this->owner->tableName();
+			throw new InvalidConfigException($msg);
 		}
-		//create array if it is not already
-		if (!is_array($pk)) $pk = [$pk=>$this->owner->{$pk}];
-
-		return Json::encode($pk);
+		
+		//create final array and return it
+		$arrPk = [];
+		foreach ($pk as $pkCol) $arrPk[$pkCol] = $this->owner->{$pkCol};
+		return Json::encode($arrPk);
 	}
 	
 	/**

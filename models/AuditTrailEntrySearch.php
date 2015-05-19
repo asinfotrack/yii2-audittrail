@@ -38,7 +38,7 @@ class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTra
 		
 		//prepare data provider
 		$query = AuditTrailEntry::find();
-		if ($subject !== null) $query->subject($subject);
+		if ($subject !== null) $query->subject($subject)->orderNewestFirst(true);
 		$dataProvider = new ActiveDataProvider([
 			'query'=>$query,
 		]);
