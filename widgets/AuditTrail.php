@@ -91,6 +91,12 @@ class AuditTrail extends \yii\grid\GridView
 	public $attributeOutput = [];
 	
 	/**
+	 * @var string[] Attributes listed in this array won't be listed in the data table no
+	 * matter if there were changes in that attribute or not.
+	 */
+	public $hiddenAttributes = [];
+	
+	/**
 	 * @var mixed the options for the inner table displaying the actual changes
 	 */
 	public $dataTableOptions = ['class'=>'table table-condensed table-bordered'];
@@ -193,7 +199,11 @@ class AuditTrail extends \yii\grid\GridView
 					
 					//table body
 					$ret .= Html::beginTag('tbody');
-					foreach ($changes as $change) {					
+					foreach ($changes as $change) {
+						//skip hidden attributes
+						if (in_array($change['attr'], $this->hiddenAttributes)) continue;
+						
+						//render data row
 						$ret .= Html::beginTag('tr');
 						$ret .= Html::tag('td', $model->getAttributeLabel($change['attr']));
 						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['from']));

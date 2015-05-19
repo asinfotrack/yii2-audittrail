@@ -2,12 +2,12 @@
 Yii2-audittrail is a behavior and a set of widgets to track all modifications performed on a model
 
 ## Advantages
-This is not the first audit trail extension. So why use this? Those are some of the major advantages:
+This is not the first audit trail extension. So why use this one? Those are some of the major advantages:
 
-* This extension works with composite primary keys
+* this extension works with composite primary keys
 * it also works with console applications
-* You can explicitly configure what fields to log
-* GridView-baes widget to show the audit trail with huge customization options (eg rendering of values by closures, etc.)
+* you can explicitly configure what fields to log
+* GridView-baded widget to show the audit trail with huge customization options (eg rendering of values by closures, yii-formatter, etc.)
 
 ## Installation
 The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
