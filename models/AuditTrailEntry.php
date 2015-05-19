@@ -14,7 +14,7 @@ use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
  * @license MIT
  * 
  * @property integer $id
- * @property string $table_name
+ * @property string $model_type
  * @property integer $happened_at
  * @property string $foreign_pk
  * @property integer $user_id
@@ -39,10 +39,10 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	public function rules()
 	{
 		return [
-			[['table_name','happened_at','foreign_pk','type'], 'required'],
+			[['model_type','happened_at','foreign_pk','type'], 'required'],
 				
 			[['happened_at','user_id'], 'integer'],
-			[['table_name','foreign_pk','type'], 'string', 'max'=>255],
+			[['model_type','foreign_pk','type'], 'string', 'max'=>255],
 			
 			[['type'], 'in', 'range'=>AuditTrailBehavior::$AUDIT_TYPES],
 		];
@@ -52,7 +52,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	{
 		return [
 			'id'=>Yii::t('app', 'ID'),
-			'table_name'=>Yii::t('app', 'Table name'),
+			'model_type'=>Yii::t('app', 'Table name'),
 			'happened_at'=>Yii::t('app', 'Happened at'),
 			'foreign_pk'=>Yii::t('app', 'Foreign PK'),
 			'user_id'=>Yii::t('app', 'User ID'),

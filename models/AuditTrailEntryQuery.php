@@ -15,6 +15,7 @@ class AuditTrailEntryQuery extends \yii\db\ActiveQuery
 	 * Named scope to get entries for a certain model
 	 * 
 	 * @param \yii\db\ActiveRecord $model the model to get the audit trail for
+	 * @return \asinfotrack\yii2\audittrail\models\AuditTrailEntryQuery
 	 * @throws InvalidConfigException if the pk is null
 	 */
 	public function subject($model)
@@ -28,6 +29,19 @@ class AuditTrailEntryQuery extends \yii\db\ActiveQuery
 		if (!is_array($pk)) $pk = [$pk=>$this->owner->{$pk}];
 		
 		$this->andWhere(['foreign_pk'=>Json::encode($pk)]);
+		return $this;
+	}
+	
+	/**
+	 * Named scope to filter entries by their model type
+	 * 
+	 * @param string $modelType class type of the model
+	 * @return \asinfotrack\yii2\audittrail\models\AuditTrailEntryQuery
+	 */
+	public function modelType($modelType)
+	{
+		$this->andWhere(['model_type'=>$modelType]);
+		return $this;
 	}
 	
 }

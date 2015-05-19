@@ -24,6 +24,9 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	const AUDIT_TYPE_UPDATE = 'update';
 	const AUDIT_TYPE_DELETE = 'delete';
 	
+	/**
+	 * @var string[] holds all allowed audit types
+	 */
 	public static $AUDIT_TYPES = [self::AUDIT_TYPE_INSERT, self::AUDIT_TYPE_UPDATE, self::AUDIT_TYPE_DELETE];
 	
 	/**
@@ -45,10 +48,24 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	public $consoleUserId = null;
 	
 	/**
-	 * @var boolean if set to true, the initial data fields will be persisted upon creation.
-	 * Defaults to true.
+	 * @var boolean if set to true, the data fields will be persisted upon insert. Defaults to true.
 	 */
 	public $persistValuesOnInsert = true;
+	
+	/**
+	 * @var boolean if set to true, inserts will be logged (default: true)
+	 */
+	public $logInsert = true;
+	
+	/**
+	 * @var boolean if set to true, updates will be logged (default: true)
+	 */
+	public $logUpdate = true;
+	
+	/**
+	 * @var boolean if set to true, deletes will be logged (default: true)
+	 */
+	public $logDelete = true;
 	
 	/**
 	 * (non-PHPdoc)
@@ -84,6 +101,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	 */
 	public function onAfterInsert($event)
 	{
+		if (!$this->logInsert) return;
 		$entry = $this->createPreparedAuditTrailEntry(self::AUDIT_TYPE_INSERT);
 		
 		//if configured write initial values
@@ -103,6 +121,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	 */
 	public function onAfterUpdate($event)
 	{
+		if (!$this->logUpdate) return;		
 		$entry = $this->createPreparedAuditTrailEntry(self::AUDIT_TYPE_UPDATE);
 		
 		//fetch dirty attributes and add changes
@@ -122,6 +141,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	 */
 	public function onBeforeDelete()
 	{
+		if (!$this->logDelete) return;
 		$entry = $this->createPreparedAuditTrailEntry(self::AUDIT_TYPE_DELETE);
 
 		static::saveEntry($entry);
@@ -136,7 +156,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	protected function createPreparedAuditTrailEntry($changeKind)
 	{
 		return new HistoryEntry([
-			'table_name'=>$this->owner->tableName(),
+			'model_type'=>$this->owner->className(),
 			'foreign_pk'=>$this->createPrimaryKeyJson(),
 			'happened_at'=>$this->getHappenedAt(),
 			'user_id'=>$this->getUserId(),

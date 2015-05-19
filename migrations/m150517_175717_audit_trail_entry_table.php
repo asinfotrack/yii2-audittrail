@@ -20,7 +20,7 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 	{
 		$this->createTable('{{%audit_trail_entry}}', [
 			'id'=>Schema::TYPE_PK,
-			'table_name'=>Schema::TYPE_STRING . ' NOT NULL',
+			'model_type'=>Schema::TYPE_STRING . ' NOT NULL',
 			'happened_at'=>Schema::TYPE_INTEGER . ' NOT NULL',
 			'foreign_pk'=>Schema::TYPE_STRING . ' NOT NULL',
 			'user_id'=>Schema::TYPE_INTEGER . ' NULL',
