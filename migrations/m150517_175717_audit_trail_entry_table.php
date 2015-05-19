@@ -27,7 +27,7 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 			'type'=>Schema::TYPE_STRING . ' NOT NULL',
 			'data'=>Schema::TYPE_TEXT . ' NULL',
 		]);
-		$this->createIndex('IN_audit_trail_entry_fast_access', '{{%audit_trail_entry}}', ['table_name ASC','happened_at DESC']);
+		$this->createIndex('IN_audit_trail_entry_fast_access', '{{%audit_trail_entry}}', ['model_type ASC','happened_at DESC']);
 		$this->addForeignKey('FK_audit_trail_entry_user', 
 				'{{%audit_trail_entry}}', ['user_id'], 
 				'{{%user}}', ['id'], 
