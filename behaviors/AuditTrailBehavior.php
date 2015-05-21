@@ -71,6 +71,24 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	public $logDelete = true;
 	
 	/**
+	 * @var \Closure[] contains an array with a model attribute as key and a either a string with
+	 * a default yii-format or a closure as its value. Example:
+	 * <code>
+	 * 		[
+	 * 			'title'=>function($value) {
+	 * 				return Html::tag('strong', $value);
+	 *			},
+	 *			'email'=>'email',
+	 * 		]
+	 * </code>	 *
+	 * This provides the AuditTrail-widget the ability to render related objects or complex value instead of
+	 * raw data changed. You could for example display a users name instead of his plain id.
+	 *
+	 * Make sure each closure is in the format 'function ($value)'.
+	 */
+	public $attributeOutput = [];
+	
+	/**
 	 * (non-PHPdoc)
 	 * @see \yii\base\Behavior::attach()
 	 */

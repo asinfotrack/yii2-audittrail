@@ -51,6 +51,13 @@ public function behaviors()
     		// some of the optional configurations
     		'ignoredAttributes'=>['created_at','updated_at'],
     		'consoleUserId'=>1, 
+			'attributeOutput'=>[
+				'desktop_id'=>function ($value) {
+					$model = Desktop::findOne($value);
+					return sprintf('%s %s', $model->manufacturer, $model->device_name);
+				},
+				'last_checked'=>'datetime',
+			],
     	],
     	// ...
     ];
@@ -71,13 +78,6 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 	'changeTypeCallback'=>function ($type, $model) {
 		return Html::tag('span', strtoupper($type), ['class'=>'label label-info']);
 	},
-	'attributeOutput'=>[
-		'desktop_id'=>function ($value) {
-			$model = Desktop::findOne($value);
-			return sprintf('%s %s', $model->manufacturer, $model->device_name);
-		},
-		'last_checked'=>'datetime',
-	],
 	'dataTableOptions'=>['class'=>'table table-condensed table-bordered'],
 ]) ?>
 ```

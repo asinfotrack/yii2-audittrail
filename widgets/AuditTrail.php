@@ -22,13 +22,6 @@ use asinfotrack\yii2\audittrail\models\AuditTrailEntrySearch;
  * 		'changeTypeCallback'=>function ($type, $model) {
  * 			return Html::tag('span', strtoupper($type), ['class'=>'label label-info']);
  * 		},
- * 		'attributeOutput'=>[
- * 			'desktop_id'=>function ($value) {
- * 				$model = Desktop::findOne($value);
- * 				return sprintf('%s %s', $model->manufacturer, $model->device_name);
- * 			},
- * 			'last_checked'=>'datetime',
- * 		],
  *		'dataTableOptions'=>['class'=>'table table-condensed table-bordered'],
  * ]);
  * </code>
@@ -39,6 +32,12 @@ use asinfotrack\yii2\audittrail\models\AuditTrailEntrySearch;
  */
 class AuditTrail extends \yii\grid\GridView
 {
+	
+	/**
+	 * @var \asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior holds the configuration
+	 * of the audit trail behavior once loaded or null if not found
+	 */
+	protected $behaviorInstance;
 	
 	/**
 	 * @var \yii\db\ActiveRecord the model to list the audit for. The model
@@ -73,24 +72,6 @@ class AuditTrail extends \yii\grid\GridView
 	public $changeTypeCallback = null;
 	
 	/**
-	 * @var \Closure[] contains an array with a model attribute as key and a either a string with 
-	 * a default yii-format or a closure as its value. Example:
-	 * <code>
-	 * 		[
-	 * 			'title'=>function($value) {
-	 * 				return Html::tag('strong', $value);
-	 *			},
-	 *			'email'=>'email',
-	 * 		]
-	 * </code>	 * 
-	 * This provides you the ability to render related objects or complex value instead of
-	 * raw data changed. You could for example display a users name instead of his plain id.
-	 * 
-	 * Make sure each closure is in the format 'function ($value)'.
-	 */
-	public $attributeOutput = [];
-	
-	/**
 	 * @var string[] Attributes listed in this array won't be listed in the data table no
 	 * matter if there were changes in that attribute or not.
 	 */
@@ -113,14 +94,8 @@ class AuditTrail extends \yii\grid\GridView
 		}
 		
 		//assert model has behavior
-		$foundBehavior = false;
-		foreach ($this->model->behaviors() as $b) {
-			if ($b['class'] != AuditTrailBehavior::className()) continue;
-			
-			$foundBehavior = true;
-			break;
-		}
-		if (!$foundBehavior) {
+		$this->behaviorInstance = $this->getBehaviorInstance();
+		if ($this->behaviorInstance === null) {
 			throw new InvalidConfigException('Model of type ' . $this->model->className() . 'doesn\'t have AuditTrailBehavior!');
 		}
 		
@@ -146,7 +121,7 @@ class AuditTrail extends \yii\grid\GridView
 		//get local references
 		$userIdCallback = $this->userIdCallback;
 		$changeTypeCallback = $this->changeTypeCallback;
-		$attributeOutput = $this->attributeOutput;
+		$attributeOutput = $this->behaviorInstance->attributeOutput;
 		$dataTableOptions = $this->dataTableOptions;
 		
 		//prepare column config
@@ -237,22 +212,39 @@ class AuditTrail extends \yii\grid\GridView
 	protected function formatValue($attrName, $value)
 	{
 		//check if there is a formatter defined
-		if (isset($this->attributeOutput[$attrName])) {
+		if (isset($this->behaviorInstance->attributeOutput[$attrName])) {
+			$attrOutput = $this->behaviorInstance->attributeOutput[$attrName];
+			
 			//assert attr output format is either a string or a closure
-			if (!is_string($this->attributeOutput[$attrName]) && !($this->attributeOutput[$attrName] instanceof \Closure)) {
+			if (!is_string($attrOutput) && !($attrOutput instanceof \Closure)) {
 				$msg = sprintf('The attribute out put for the attribute %s is invalid. It needs to be a string or a closure!', $attrName);
 				throw new InvalidConfigException($msg);
 			}
 
 			//perform formatting
-			if ($this->attributeOutput[$attrName] instanceof \Closure) {
-				return call_user_func($this->attributeOutput[$attrName], $value);
+			if ($attrOutput instanceof \Closure) {
+				return call_user_func($attrOutput, $value);
 			} else {
-				return Yii::$app->formatter->format($value, $this->attributeOutput[$attrName]);
+				return Yii::$app->formatter->format($value, $attrOutput);
 			}			
 		} else {
 			return Yii::$app->formatter->asText($value);
 		}
+	}
+	
+	/**
+	 * Finds the models audit trail behavior configuration and returns it
+	 * 
+	 * @return \asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior|null the configuration or null if not found
+	 */
+	protected function getBehaviorInstance()
+	{
+		foreach ($this->model->behaviors() as $name=>$config) {
+			if ($config['class'] == AuditTrailBehavior::className()) {
+				return $this->model->getBehavior($name);
+			}
+		}		
+		return null;
 	}
 	
 }
