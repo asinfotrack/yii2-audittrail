@@ -100,7 +100,7 @@ class AuditTrail extends \yii\grid\GridView
 	 * @var mixed the options for the inner table displaying the actual changes
 	 */
 	public $dataTableOptions = ['class'=>'table table-condensed table-bordered'];
-	
+		
 	/**
 	 * (non-PHPdoc)
 	 * @see \yii\grid\GridView::init()
@@ -192,7 +192,9 @@ class AuditTrail extends \yii\grid\GridView
 					$ret .= Html::beginTag('thead');
 					$ret .= Html::beginTag('tr');
 					$ret .= Html::tag('th', Yii::t('app', 'Attribute'));
-					$ret .= Html::tag('th', Yii::t('app', 'From'));
+					if ($model->type === AuditTrailBehavior::AUDIT_TYPE_UPDATE) {
+						$ret .= Html::tag('th', Yii::t('app', 'From'));
+					}
 					$ret .= Html::tag('th', Yii::t('app', 'To'));
 					$ret .= Html::endTag('tr');
 					$ret .= Html::endTag('thead');
@@ -205,8 +207,10 @@ class AuditTrail extends \yii\grid\GridView
 						
 						//render data row
 						$ret .= Html::beginTag('tr');
-						$ret .= Html::tag('td', $model->getAttributeLabel($change['attr']));
-						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['from']));
+						$ret .= Html::tag('td', $this->model->getAttributeLabel($change['attr']));
+						if ($model->type === AuditTrailBehavior::AUDIT_TYPE_UPDATE) {
+							$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['from']));
+						}
 						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['to']));
 						$ret .= Html::endTag('tr');
 					}

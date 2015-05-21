@@ -110,7 +110,11 @@ class AuditTrailBehavior extends \yii\base\Behavior
 		//if configured write initial values
 		if ($this->persistValuesOnInsert) {
 			foreach ($this->getRelevantDbAttributes() as $attrName) {
-				$entry->data[] = $this->createAttrChangeObj($attrName, null, $this->owner->{$attrName}); 
+				$newVal = $this->owner->{$attrName};
+				if ($newVal == '') $newVal = null;
+				if ($newVal === null) continue;
+				
+				$entry->addChange($attrName, null, $newVal); 
 			}
 		}
 		
