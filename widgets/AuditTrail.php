@@ -81,7 +81,22 @@ class AuditTrail extends \yii\grid\GridView
 	 * @var mixed the options for the inner table displaying the actual changes
 	 */
 	public $dataTableOptions = ['class'=>'table table-condensed table-bordered'];
-		
+
+	/**
+	 * @var array configuration for the data tables column-widths. Three keys are used:
+	 * - 'attribute':	width of the first column containing the attribute name
+	 * - 'from':		width of the from-column
+	 * - 'to:			width of the to column
+	 * 
+	 * Used a string to define this property. The string will be used as the css-width-value
+	 * of the corresponding '<col>'-tag within the colgroup definition.
+	 */
+	public $dataTableColumnWidths = [
+		'attribute'=>null,
+		'from'=>'30%',
+		'to'=>'30%',	
+	];
+	
 	/**
 	 * (non-PHPdoc)
 	 * @see \yii\grid\GridView::init()
@@ -162,6 +177,15 @@ class AuditTrail extends \yii\grid\GridView
 					}
 					
 					$ret = Html::beginTag('table', $dataTableOptions);
+					
+					//colgroup
+					$ret .= Html::beginTag('colgroup');
+					$widths = $this->dataTableColumnWidths;
+					$ret .= Html::tag('col', '', ['style'=>sprintf('width: %s;', isset($widths['attribute']) ? $widths['attribute'] : 'auto')]);
+					if ($model->type === AuditTrailBehavior::AUDIT_TYPE_UPDATE) {	
+						$ret .= Html::tag('col', '', ['style'=>sprintf('width: %s;', isset($widths['from']) ? $widths['from'] : 'auto')]);
+					}
+					$ret .= Html::tag('col', '', ['style'=>sprintf('width: %s;', isset($widths['to']) ? $widths['to'] : 'auto')]);
 					
 					//table head
 					$ret .= Html::beginTag('thead');
