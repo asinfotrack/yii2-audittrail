@@ -96,7 +96,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	{
 		//assert owner extends class ActiveRecord
 		if (!($owner instanceof ActiveRecord)) {
-			throw new InvalidConfigException('The AuditTrailBehavior can only be applied to classes extending \yii\db\ActiveRecord');
+			throw new InvalidConfigException('AuditTrailBehavior can only be applied to classes extending \yii\db\ActiveRecord');
 		}
 	
 		parent::attach($owner);
