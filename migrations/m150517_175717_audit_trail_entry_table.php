@@ -1,6 +1,7 @@
 <?php
 
 use yii\db\Schema;
+use yii\db\Expression;
 
 /**
  * Migration to create or remove audit trail entry table

@@ -5,9 +5,9 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidValueException;
-use asinfotrack\yii2\audittrail\models\AuditTrailEntry;
 use yii\helpers\Json;
 use yii\validators\DefaultValueValidator;
+use asinfotrack\yii2\audittrail\models\AuditTrailEntry;
 
 /**
  * Behavior which enables a model to be audited. Each modification (insert, update and delete)
