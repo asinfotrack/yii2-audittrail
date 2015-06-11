@@ -53,6 +53,7 @@ class AuditTrailEntryQuery extends \yii\db\ActiveQuery
 		$arrPk = [];
 		foreach ($pk as $pkCol) $arrPk[$pkCol] = $model->{$pkCol};
 		
+		$this->modelType($model::className());
 		$this->andWhere(['foreign_pk'=>Json::encode($arrPk)]);
 		return $this;
 	}
