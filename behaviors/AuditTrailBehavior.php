@@ -5,9 +5,8 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidValueException;
-use yii\helpers\Json;
-use yii\validators\DefaultValueValidator;
 use asinfotrack\yii2\audittrail\models\AuditTrailEntry;
+use asinfotrack\yii2\toolbox\helpers\PrimaryKey;
 
 /**
  * Behavior which enables a model to be audited. Each modification (insert, update and delete)
@@ -39,7 +38,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	public $ignoredAttributes = [];
 	
 	/**
-	 * @var \Closure|null optoinal closure to return the timestamp of an event. It needs to be
+	 * @var \Closure|null optional closure to return the timestamp of an event. It needs to be
 	 * in the format 'function() { }' returning an integer. If not set 'time()' is used.
 	 */
 	public $timestampCallback = null;
@@ -89,8 +88,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	public $attributeOutput = [];
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\base\Behavior::attach()
+	 * @inheritdoc
 	 */
 	public function attach($owner)
 	{
@@ -103,8 +101,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\base\Behavior::events()
+	 * @inheritdoc
 	 */
 	public function events()
 	{
@@ -151,7 +148,6 @@ class AuditTrailBehavior extends \yii\base\Behavior
 		
 		//fetch dirty attributes and add changes
 		$relevantAttrs = $this->getRelevantDbAttributes();
-		$defValidator = new DefaultValueValidator();
 		foreach ($event->changedAttributes as $attrName=>$oldVal) {
 			//skip if ignored
 			if (!in_array($attrName, $relevantAttrs)) continue;
@@ -229,31 +225,21 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * Creates the json-represenation of the pk (array in the format attribute=>value
-	 * 
+	 * Creates the json-representation of the pk (array in the format attribute=>value
+	 * @see \asinfotrack\yii2\toolbox\helpers\PrimaryKey::asJson()
+	 *
 	 * @return string json-representation of the pk-array
-	 * @throws InvalidConfigException if the returned pk is null
+	 * @throws \yii\base\InvalidParamException if the model is not of type ActiveRecord
+	 * @throws \yii\base\InvalidConfigException if the models pk is empty or invalid
 	 */
 	protected function createPrimaryKeyJson()
 	{
-		//fetch the objects pk	
-		$pk = $this->owner->primaryKey();
-		
-		//assert that a valid pk was received
-		if ($pk === null || !is_array($pk) || count($pk) == 0) {
-			$msg = 'Invalid primary key definition: please provide a pk-definition for table ' . $this->owner->tableName();
-			throw new InvalidConfigException($msg);
-		}
-		
-		//create final array and return it
-		$arrPk = [];
-		foreach ($pk as $pkCol) $arrPk[$pkCol] = $this->owner->{$pkCol};
-		return Json::encode($arrPk);
+		return PrimaryKey::asJson($this->owner);
 	}
 	
 	/**
 	 * This method is responsible to create a list of relevant db-columns to track. The ones
-	 * listed to exlude will be removed here already.
+	 * listed to exclude will be removed here already.
 	 * 
 	 * @return string[] array containing relevant db-columns
 	 */
@@ -276,7 +262,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * Saves the entry and outputs an exception desccribing the problem if necessary
+	 * Saves the entry and outputs an exception describing the problem if necessary
 	 * 
 	 * @param \asinfotrack\yii2\audittrail\models\AuditTrailEntry $entry
 	 * @throws InvalidValueException if entry couldn't be saved (validation error)

@@ -1,6 +1,7 @@
 <?php
 namespace asinfotrack\yii2\audittrail\models;
 
+use yii\base\InvalidConfigException;
 use yii\helpers\Json;
 
 /**

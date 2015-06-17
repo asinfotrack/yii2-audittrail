@@ -23,7 +23,8 @@
 	"require": {
 		"php": ">=5.4.0",
 		
-		"yiisoft/yii2": "2.0.*"
+		"yiisoft/yii2": "2.0.*",
+        "asinfotrack/yii2-toolbox": "dev-master"
 	},
 	
 	"autoload": {

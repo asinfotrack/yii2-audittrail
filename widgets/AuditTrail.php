@@ -2,9 +2,7 @@
 namespace asinfotrack\yii2\audittrail\widgets;
 
 use Yii;
-use yii\grid\DataColumn;
 use yii\helpers\Html;
-use yii\helpers\Json;
 use yii\base\InvalidConfigException;
 use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
 use asinfotrack\yii2\audittrail\models\AuditTrailEntrySearch;

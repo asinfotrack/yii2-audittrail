@@ -14,8 +14,7 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 {
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\db\Migration::up()
+	 * @inheritdoc
 	 */
 	public function up()
 	{
@@ -28,7 +27,6 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 			'type'=>Schema::TYPE_STRING . ' NOT NULL',
 			'data'=>Schema::TYPE_TEXT . ' NULL',
 		]);
-		$exprModelType = new Expression('`model_type` ASC');
 		$this->createIndex('IN_audit_trail_entry_fast_access', '{{%audit_trail_entry}}', [
 			new Expression('`model_type` ASC'), 
 			new Expression('`happened_at` DESC'),
@@ -40,8 +38,7 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\db\Migration::down()
+	 * @inheritdoc
 	 */
 	public function down()
 	{

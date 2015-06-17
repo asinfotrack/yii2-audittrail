@@ -1,9 +1,17 @@
 <?php
 namespace asinfotrack\yii2\audittrail\models;
 
+use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
 
+/**
+ * Search class for audit trail entries
+ *
+ * @author Pascal Mueller, AS infotrack AG
+ * @link http://www.asinfotrack.ch
+ * @license MIT
+ */
 class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTrailEntry
 {
 	
@@ -17,8 +25,7 @@ class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTra
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\base\Model::scenarios()
+	 * @inheritdoc
 	 */
 	public function scenarios()
 	{
@@ -27,10 +34,11 @@ class AuditTrailEntrySearch extends \asinfotrack\yii2\audittrail\models\AuditTra
 	}
 	
 	/**
-	 * Creates the dataprovider for searching audit trails
-	 * @param mixed $params the params as used by yii's search methods
+	 * Creates the data-provider for searching audit trails
+	 *
+	 * @param mixed $params the params as used by yiis search methods
 	 * @param \yii\db\ActiveRecord $subject the model to get the audit trail entries for
-	 * @return \asinfotrack\yii2\audittrail\models\ActiveDataProvider
+	 * @return \yii\data\ActiveDataProvider
 	 */
 	public function search($params, $subject=null)
 	{

@@ -40,8 +40,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	}
 	
 	/**
-	 * (non-PHPdoc)
-	 * @see \yii\base\Model::rules()
+	 * @inheritdoc
 	 */
 	public function rules()
 	{
@@ -54,7 +53,10 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 			[['type'], 'in', 'range'=>AuditTrailBehavior::$AUDIT_TYPES],
 		];
 	}
-	
+
+	/**
+	 * @inheritdoc
+	 */
 	public function attributeLabels()
 	{
 		return [
@@ -78,7 +80,8 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	}
 	
 	/**
-	 * (non-PHPdoc)
+	 * @inheritdoc
+	 *
 	 * @see \yii\db\BaseActiveRecord::beforeSave($insert)
 	 * @throws \yii\base\InvalidCallException if trying to update a record (this is not allowed!)
 	 */
