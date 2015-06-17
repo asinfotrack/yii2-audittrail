@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "faddc3ab920f0517586b36423314e9af",
+    "hash": "d8cda9a046ae8530a3150cef0c2f0b3f",
     "packages": [
         {
             "name": "asinfotrack/yii2-toolbox",

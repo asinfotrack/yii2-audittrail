@@ -1,8 +1,7 @@
 <?php
 namespace asinfotrack\yii2\audittrail\models;
 
-use yii\base\InvalidConfigException;
-use yii\helpers\Json;
+use asinfotrack\yii2\toolbox\helpers\PrimaryKey;
 
 /**
  * Query class for audit trail entries
@@ -37,25 +36,13 @@ class AuditTrailEntryQuery extends \yii\db\ActiveQuery
 	 * 
 	 * @param \yii\db\ActiveRecord $model the model to get the audit trail for
 	 * @return \asinfotrack\yii2\audittrail\models\AuditTrailEntryQuery
-	 * @throws InvalidConfigException if the pk is null
+	 * @throws \yii\base\InvalidParamException if the model is not of type ActiveRecord
+	 * @throws \yii\base\InvalidConfigException if the models pk is empty or invalid
 	 */
 	public function subject($model)
 	{
-		//fetch the objects pk
-		$pk = $model->primaryKey();
-		
-		//assert that a valid pk was received
-		if ($pk === null || !is_array($pk) || count($pk) == 0) {
-			$msg = 'Invalid primary key definition: please provide a pk-definition for table ' . $model->tableName();
-			throw new InvalidConfigException($msg);
-		}
-		
-		//create final array and return it
-		$arrPk = [];
-		foreach ($pk as $pkCol) $arrPk[$pkCol] = $model->{$pkCol};
-		
 		$this->modelType($model::className());
-		$this->andWhere(['foreign_pk'=>Json::encode($arrPk)]);
+		$this->andWhere(['foreign_pk'=>static::createPrimaryKeyJson($model)]);
 		return $this;
 	}
 	
@@ -69,6 +56,19 @@ class AuditTrailEntryQuery extends \yii\db\ActiveQuery
 	{
 		$this->andWhere(['model_type'=>$modelType]);
 		return $this;
+	}
+
+	/**
+	 * Creates the json-representation of the pk (array in the format attribute=>value)
+	 * @see \asinfotrack\yii2\toolbox\helpers\PrimaryKey::asJson()
+	 *
+	 * @return string json-representation of the pk-array
+	 * @throws \yii\base\InvalidParamException if the model is not of type ActiveRecord
+	 * @throws \yii\base\InvalidConfigException if the models pk is empty or invalid
+	 */
+	protected static function createPrimaryKeyJson($model)
+	{
+		return PrimaryKey::asJson($model->owner);
 	}
 	
 }

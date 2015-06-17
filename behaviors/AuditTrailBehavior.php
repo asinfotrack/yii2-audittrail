@@ -225,7 +225,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	}
 	
 	/**
-	 * Creates the json-representation of the pk (array in the format attribute=>value
+	 * Creates the json-representation of the pk (array in the format attribute=>value)
 	 * @see \asinfotrack\yii2\toolbox\helpers\PrimaryKey::asJson()
 	 *
 	 * @return string json-representation of the pk-array
