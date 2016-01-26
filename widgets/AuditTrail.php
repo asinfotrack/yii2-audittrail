@@ -170,7 +170,7 @@ class AuditTrail extends \yii\grid\GridView
 					
 					//catch empty data
 					$changes = $model->changes;
-					if ($changes === null || count($changes) == 0) {
+					if ($changes === null || count($changes) === 0) {
 						return null;
 					}
 					

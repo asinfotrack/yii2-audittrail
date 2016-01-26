@@ -108,7 +108,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	public function getChanges()
 	{
 		if ($this->_changes === null) {
-			$this->_changes = Json::decode($this->data);
+			$this->_changes = $this->data !== null ? Json::decode($this->data) : [];
 		}
 		return $this->_changes;
 	}
