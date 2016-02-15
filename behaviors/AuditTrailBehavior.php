@@ -153,7 +153,6 @@ class AuditTrailBehavior extends \yii\base\Behavior
 			if (!in_array($attrName, $relevantAttrs)) continue;
 			//add change
 			$newVal = $this->owner->{$attrName};
-			if ($newVal == '') $newVal = null;
 			if ($oldVal == $newVal) continue;
 			$entry->addChange($attrName, $oldVal, $newVal);
 		}
