@@ -81,3 +81,23 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 	'dataTableOptions'=>['class'=>'table table-condensed table-bordered'],
 ]) ?>
 ```
+
+## Changelog
+
+###### v0.8.2
+Extended the functionality to detect changes (now respecting types). Furthermore added the possibility to specify whether
+or not strings should get compared case-sensitive and if empty strings should be considered as null. Both of these
+features can be configured via attributes of `AuditTrailBehavior`.
+
+Issued fixed:
+- #2: No record should be created if only changed attribute is in ignored attribute array (plm57)
+
+Other changes:
+- dependency update
+
+###### v0.8.1
+Dependencies updated, otherwise no changes.
+
+###### v0.8.0
+Main classes in a stable condition and further features will be added in a backwards-compatible way.
+All breaking changes will lead to a new minor version.

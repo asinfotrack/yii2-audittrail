@@ -22,6 +22,7 @@ use asinfotrack\yii2\audittrail\behaviors\AuditTrailBehavior;
  * @property string $data
  * 
  * @property \stdClass[] $changes
+ * @property bool $hasChanges
  */
 class AuditTrailEntry extends \yii\db\ActiveRecord
 {
@@ -115,7 +116,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	
 	/**
 	 * Setter for the changes. The changes need to be provided as instances of
-	 * sttdClass. Each object containing attr, from and to.
+	 * stdClass. Each object containing attr, from and to.
 	 * 
 	 * @param \stdClass[] $changes the changes
 	 */
@@ -123,6 +124,16 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	{
 		$this->_changes = $changes;
 		$this->data = Json::encode($this->_changes);
+	}
+
+	/**
+	 * Checks whether or not this entry has changes
+	 *
+	 * @return bool true if there are changes, otherwise false
+	 */
+	public function getHasChanges()
+	{
+		return count($this->changes) > 0;
 	}
 	
 	/**
