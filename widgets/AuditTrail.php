@@ -74,6 +74,14 @@ class AuditTrail extends \yii\grid\GridView
 	 * matter if there were changes in that attribute or not.
 	 */
 	public $hiddenAttributes = [];
+
+    /**
+     * @var callable[] optional array with closures to render each value of attributes that was changed or created.
+     * If provided use the format `function ($model, $attrName, $value)` and return the content of the cell.
+     *
+     * If not set for some attribute then would be displayed just value of this attribute, using @method formatValue
+     */
+    public $attributesCallback = [];
 	
 	/**
 	 * @var mixed the options for the inner table displaying the actual changes
@@ -206,9 +214,9 @@ class AuditTrail extends \yii\grid\GridView
 						$ret .= Html::beginTag('tr');
 						$ret .= Html::tag('td', $this->model->getAttributeLabel($change['attr']));
 						if ($model->type === AuditTrailBehavior::AUDIT_TYPE_UPDATE) {
-							$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['from']));
+							$ret .= Html::tag('td', $this->displayValue($model, $change['attr'], $change['from']));
 						}
-						$ret .= Html::tag('td', $this->formatValue($change['attr'], $change['to']));
+						$ret .= Html::tag('td', $this->displayValue($model, $change['attr'], $change['to']));
 						$ret .= Html::endTag('tr');
 					}
 					$ret .= Html::endTag('tbody');
@@ -220,6 +228,25 @@ class AuditTrail extends \yii\grid\GridView
 			],
 		];
 	}
+
+    /**
+     * Checks if exists callback for rendering value of $attrName and using that callback.
+     * In other case, just using @method formatValue to display attribute value, as defined in $model
+     *
+     * @param $model
+     * @param string $attrName
+     * @param $value
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    protected function displayValue($model, $attrName, $value)
+    {
+        if (isset($this->attributesCallback[$attrName]) && is_callable($this->attributesCallback[$attrName])){
+            return call_user_func($this->attributesCallback[$attrName], $model, $attrName, $value);
+        } else {
+            return $this->formatValue($attrName, $value);
+        }
+    }
 	
 	/**
 	 * Formats a value into its final outoput. If the value is null, the formatters null-display is used.
