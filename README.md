@@ -78,6 +78,11 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 	'changeTypeCallback'=>function ($type, $model) {
 		return Html::tag('span', strtoupper($type), ['class'=>'label label-info']);
 	},
+	'attributesCallback' => [
+              'status_id' => function($model, $attrName, $value) {
+                  return \common\models\Status::findOne($value)->title;
+              }
+    ],
 	'dataTableOptions'=>['class'=>'table table-condensed table-bordered'],
 ]) ?>
 ```
