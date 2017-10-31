@@ -42,7 +42,7 @@ class m150517_175717_audit_trail_entry_table extends \yii\db\Migration
 	 */
 	public function down()
 	{
-		$this->dropForeignKey('FK_audit_trail_entry_user', 'audit_trail_entry');
+		$this->dropForeignKey('FK_audit_trail_entry_user', '{{%audit_trail_entry}}');
 		$this->dropIndex('IN_audit_trail_entry_fast_access', '{{%audit_trail_entry}}');
 		$this->dropTable('{{%audit_trail_entry}}');
 	}

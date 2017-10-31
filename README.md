@@ -84,6 +84,15 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 
 ## Changelog
 
+###### v0.8.3
+This release fixes minor bugs and updates the dependencies
+
+Issues fixed:
+- #7: Class AuditTrailEntry uses table name without prefix
+
+Other changes:
+- dependency update
+
 ###### v0.8.2
 Extended the functionality to detect changes (now respecting types). Furthermore added the possibility to specify whether
 or not strings should get compared case-sensitive and if empty strings should be considered as null. Both of these

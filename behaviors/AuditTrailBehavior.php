@@ -229,10 +229,10 @@ class AuditTrailBehavior extends \yii\base\Behavior
 			} else {
 				return $this->consoleUserId;
 			}
-		} else if (Yii::$app->user->isGuest) {
+		} else if (Yii::$app->user->getIsGuest()) {
 			return null;
 		} else {
-			return Yii::$app->user->id;
+			return Yii::$app->user->getId();
 		}
 	}
 
