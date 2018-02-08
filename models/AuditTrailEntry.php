@@ -92,7 +92,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 		if (!$insert) throw new InvalidCallException('Updating audit trail entries is not allowed!');
 		
 		//prepare data attribute
-		if (count($this->_changes) > 0) {
+		if ($this->_changes !== null) {
 			$this->data = Json::encode($this->_changes);
 		} else {
 			$this->data = null;
@@ -133,7 +133,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	 */
 	public function getHasChanges()
 	{
-		return count($this->changes) > 0;
+		return $this->changes !== null;
 	}
 	
 	/**
