@@ -275,7 +275,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 		$cols = array_keys($this->owner->getTableSchema()->columns);
 
 		//return if no ignored cols
-		if (count($this->ignoredAttributes) === 0) return $cols;
+		if (empty($this->ignoredAttributes)) return $cols;
 
 		//remove ignored cols and return
 		$colsFinal = [];
