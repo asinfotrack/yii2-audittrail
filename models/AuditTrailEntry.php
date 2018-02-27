@@ -133,7 +133,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	 */
 	public function getHasChanges()
 	{
-		return $this->changes !== null;
+		return !empty($this->changes);
 	}
 	
 	/**
