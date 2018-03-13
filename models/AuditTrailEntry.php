@@ -37,7 +37,7 @@ class AuditTrailEntry extends \yii\db\ActiveRecord
 	 */
 	public static function tableName()
 	{
-		return 'audit_trail_entry';
+		return '{{%audit_trail_entry}}';
 	}
 	
 	/**
