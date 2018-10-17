@@ -262,7 +262,7 @@ class AuditTrail extends \yii\grid\GridView
 	protected function getBehaviorInstance()
 	{
 		foreach ($this->model->behaviors() as $name=>$config) {
-			if ($config['class'] == AuditTrailBehavior::className()) {
+			if (isset($config['class']) && $config['class'] == AuditTrailBehavior::className()) {
 				return $this->model->getBehavior($name);
 			}
 		}		
