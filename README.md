@@ -83,6 +83,8 @@ The widget is also very easy to use. Just provide the model to get the audit tra
 ```
 
 ## Changelog
+###### v0.8.4
+- Bugfixes concerning compatibility with PHP 7.2
 
 ###### v0.8.3
 This release fixes minor bugs and updates the dependencies
