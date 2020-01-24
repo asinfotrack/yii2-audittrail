@@ -334,16 +334,15 @@ class AuditTrailBehavior extends \yii\base\Behavior
 	/**
 	 * Gets all audit trail entries
 	 *
-	 * @return mixed
+	 * @return array|\yii\db\ActiveQuery
+	 * @throws \yii\base\InvalidConfigException
 	 */
 	public function getAuditTrailEntries() {
-
 		return AuditTrailEntry::find()
 			->where([
 				'model_type'=>$this->owner->className(),
 				'foreign_pk'=>$this->createPrimaryKeyJson(),
-			])
-			->all();
+			]);
 	}
 
 }
