@@ -331,4 +331,19 @@ class AuditTrailBehavior extends \yii\base\Behavior
 		throw new InvalidValueException(sprintf('Error while saving audit-trail-entry: %s', implode(', ', $lines)));
 	}
 
+	/**
+	 * Gets all audit trail entries
+	 *
+	 * @return mixed
+	 */
+	public function getAuditTrailEntries() {
+
+		return AuditTrailEntry::find()
+			->where([
+				'model_type'=>$this->owner->className(),
+				'foreign_pk'=>$this->createPrimaryKeyJson(),
+			])
+			->all();
+	}
+
 }
