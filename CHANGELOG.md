@@ -1,5 +1,8 @@
 # Changelog
 
+###### v.1.0.2
+- fixed bug in AuditTrail widget
+
 ###### v1.0.1
 - new method on AuditTrailBehavior to fetch the AuditTrailEntries
 
