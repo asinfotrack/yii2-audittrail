@@ -1,5 +1,8 @@
 # Changelog
 
+###### v.1.0.3
+- fixed AuditTrailBehavior::onAfterUpdate() for PHP 8.1
+
 ###### v.1.0.2
 - fixed bug in AuditTrail widget
 
