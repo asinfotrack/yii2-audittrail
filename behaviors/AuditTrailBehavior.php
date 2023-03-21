@@ -170,7 +170,7 @@ class AuditTrailBehavior extends \yii\base\Behavior
 			$newVal = static::castValue($oldVal, $this->owner->{$attrName});
 
 			//additional comparison after casting
-			if ((is_string($newVal) && call_user_func($this->caseSensitive ? 'strcmp' : 'strcasecmp', $oldVal, $newVal) === 0) || $oldVal === $newVal) {
+			if ($oldVal === $newVal || (is_string($newVal) && is_string($oldVal) && call_user_func($this->caseSensitive ? 'strcmp' : 'strcasecmp', $oldVal, $newVal) === 0)) {
 				continue;
 			}
 
